@@ -220,11 +220,22 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     //MARK: fetch the location
     //get locaion from local but if not found got to gps
     func getLocation(){
-        if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
+        print("hleoooooooooooooooooooooooo")
+        print(UserDefaults.standard.double(forKey: "lat"))
+          print("hleoooooooooooooooooooooooo")
+       var testlat =  UserDefaults.standard.double(forKey: "lat")
+        var testlong =  UserDefaults.standard.double(forKey: "long")
+        if  testlat != nil &&  testlong != nil {
+        
             lat = UserDefaults.standard.double(forKey: "lat")
             long = UserDefaults.standard.double(forKey: "long")
+            print("whyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
+            print(lat)
+            print(long)
+            print("whyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
             timezone()
         }else{
+            print("reallyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
             loctionManger.startUpdatingLocation()
             locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
         }
@@ -235,6 +246,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     // get location from gps
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        print("//////////////////////////////////////////////////////")
         //to chick if there is saved location dont go to the api
         if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
             lat = UserDefaults.standard.double(forKey: "lat")
@@ -249,7 +261,10 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             // save latitude longitude data
             lat = location.coordinate.latitude
             long = location.coordinate.longitude
-
+print("//////////////////////////////////////////////////////")
+            print(lat)
+            print(long)
+print("//////////////////////////////////////////////////////")
             UserDefaults.standard.set(lat, forKey: "lat")
             UserDefaults.standard.set(long, forKey: "long")
             
@@ -267,7 +282,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     func timezone(){
         // get timezone data
         let timeZone : String?
-        if let curTimeZone = UserDefaults.standard.string(forKey: "timeZone"){
+       if let curTimeZone = UserDefaults.standard.string(forKey: "timeZone"){
             timeZone = curTimeZone
         } else {
         var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
@@ -293,6 +308,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
                     // save JSON result in variable
                     let fetchedPrayerTimes : JSON = JSON(response.result.value!)
                     // show pray time in UI
+                    print(fetchedPrayerTimes)
                     self.fajerPrayerTime.text = fetchedPrayerTimes["times"][0].stringValue
                     self.dohorPrayerTime.text = fetchedPrayerTimes["times"][2].stringValue
                     self.aserPrayerTime.text = fetchedPrayerTimes["times"][3].stringValue
@@ -377,7 +393,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         }
         indexOfNextPrayer = index
         updateNextPrayerColores()
-        playSound()
+    
     }
     
     
@@ -508,13 +524,14 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     //FIXME: NOTIFICATION DONT WORK
     ////when azan is soon send notification to the user
     func sendNotification(){
+        
         let prayers = ["fajer","dohor","asr","maghreb","isha"]
         
         let content = UNMutableNotificationContent()
         content.title = "\(prayers[indexOfNextPrayer]) azan will be after 5 minutes"
         content.badge = 1
 
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
         let request = UNNotificationRequest(identifier: "azanSoon", content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
