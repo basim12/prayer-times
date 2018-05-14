@@ -21,32 +21,33 @@
                         <subviews>
                             <imageView userInteractionEnabled="NO" alpha="0.75" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Mosque" translatesAutoresizingMaskIntoConstraints="NO" id="Qq8-lR-Db0" userLabel="MosqueImage">
                                 <rect key="frame" x="0.0" y="64" width="414" height="672"/>
+                                <color key="backgroundColor" red="0.0" green="0.24639221950000001" blue="0.3355423347" alpha="0.60097388698630139" colorSpace="custom" customColorSpace="sRGB"/>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RTI-NC-eAx" userLabel="topView">
                                 <rect key="frame" x="0.0" y="64" width="414" height="336"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="k34-fh-weH" userLabel="Stack nextPrayer">
-                                        <rect key="frame" x="0.0" y="276" width="414" height="50"/>
+                                        <rect key="frame" x="0.0" y="266" width="414" height="60"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="      Next prayer" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gsu-1j-iq0">
-                                                <rect key="frame" x="0.0" y="0.0" width="177.66666666666666" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="177.66666666666666" height="60"/>
                                                 <color key="backgroundColor" red="0.0065792614640000002" green="0.24639221950000001" blue="0.3355423347" alpha="0.60097388698630139" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O6G-xA-1FM" customClass="MZTimerLabel" customModule="prayer_times" customModuleProvider="target">
-                                                <rect key="frame" x="177.66666666666663" y="0.0" width="177.33333333333337" height="50"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O6G-xA-1FM" customClass="MZTimerLabel" customModule="prayer_times" customModuleProvider="target">
+                                                <rect key="frame" x="177.66666666666663" y="0.0" width="177.33333333333337" height="60"/>
                                                 <color key="backgroundColor" red="0.0065792614640000002" green="0.24639221950000001" blue="0.3355423347" alpha="0.59883347602739723" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="height" constant="50" id="bBA-qM-9Y9"/>
+                                                    <constraint firstAttribute="height" constant="60" id="bBA-qM-9Y9"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="74a-7I-5F2">
-                                                <rect key="frame" x="355" y="0.0" width="59" height="50"/>
+                                                <rect key="frame" x="355" y="0.0" width="59" height="60"/>
                                                 <color key="backgroundColor" red="0.0065792614640000002" green="0.24639221950000001" blue="0.3355423347" alpha="0.59883347600000003" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <state key="normal" image="watch2"/>
                                                 <connections>
@@ -56,6 +57,7 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="O6G-xA-1FM" firstAttribute="width" secondItem="gsu-1j-iq0" secondAttribute="width" id="2RY-M4-dze"/>
+                                            <constraint firstAttribute="height" constant="60" id="6Cy-Rr-lr5"/>
                                             <constraint firstItem="74a-7I-5F2" firstAttribute="width" secondItem="O6G-xA-1FM" secondAttribute="width" multiplier="1:3" id="FQY-G2-cDp"/>
                                         </constraints>
                                     </stackView>

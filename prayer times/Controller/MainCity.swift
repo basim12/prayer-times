@@ -5,11 +5,11 @@
 //  Created by hammam abdulaziz on 15/08/1439 AH.
 //  Copyright © 1439 hammam abdulaziz. All rights reserved.
 //
-//TODO:fix am
-//TODO:fix notification
-//TODO:fix bright of next prayer
-//TODO:bring comment from old code
-//TODO:fix synce of time
+//TODO:add translation
+//TODO:add silence mode at prayer time
+//TODO:add the time of every city
+//TODO:add city to the user screen
+//TODO:consider summer time
 import UIKit
 import ChameleonFramework
 import Alamofire
@@ -89,7 +89,6 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             maghrebPrayerTime.text = timesOfPrayers[3]
             ishaPrayerTime.text = timesOfPrayers[4]
             isAM = !isAM
-            
         }else{
             fajerPrayerTime.text = convertToAM(time: getHour(prayNumber: 0), prayNumber: 0)
             dohorPrayerTime.text = convertToAM(time: getHour(prayNumber: 1), prayNumber: 1)
@@ -98,6 +97,38 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             ishaPrayerTime.text = convertToAM(time: getHour(prayNumber: 4), prayNumber: 4)
             isAM = !isAM
         }
+    }
+    
+    
+    
+    
+    //git the prayer time and convert it in am,pm mode
+    func convertToAM(time : Int , prayNumber: Int) -> String{
+        if time > 12 {
+            
+            if time < 22{
+                return "0\(time - 12):\(Int(timesOfPrayers[prayNumber].split(separator: ":")[1])!) PM"
+            }else{
+                return "\(time - 12):\(Int(timesOfPrayers[prayNumber].split(separator: ":")[1])!) PM"
+            }
+        }
+        else {
+            
+            if time < 10{
+                return "0\(time):\(Int(timesOfPrayers[prayNumber].split(separator: ":")[1])!) AM"
+            }else{
+                return "\(time):\(Int(timesOfPrayers[prayNumber].split(separator: ":")[1])!) AM"
+            }
+            
+        }
+    }
+    
+    
+    
+    
+    //git hour of prayer time
+    func getHour(prayNumber : Int) -> Int{
+        return Int(timesOfPrayers[prayNumber].split(separator: ":")[0])!
     }
     
     
@@ -156,19 +187,19 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     
-  
-              //MARK: fetch the city name
-    //TODO: consider if want to change the value of city in local 
+    //MARK: fetch the city name from GOOGLE MAP API
+    //FIXME: consider if want to change the value of city in local
+    //FIXME: can not get city name
     //bring the city name from gps and display it in screen
      func getCityName() {
-              //to chick if there is a saved name doni go to the api
-
-        if let cityName = UserDefaults.standard.string(forKey: "cityName"){
-            self.cityNameLabel.text = cityName
+        //to chick if there is a saved name dont go to the api
+        if UserDefaults.standard.string(forKey: "cityName") != nil{
+            self.cityNameLabel.text = UserDefaults.standard.string(forKey: "cityName")
         }else{
         placesClient.currentPlace(callback: { (placeLikelihoodList, error) -> Void in
             if let error = error {
                 print("Pick Place error: \(error.localizedDescription)")
+                self.cityNameLabel.text? = "City name error"
                 return
             }
             if let placeLikelihoodList = placeLikelihoodList {
@@ -181,19 +212,30 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             }
         })
         }
-        
     }
-    
- 
-        
     
     
     
     
     //MARK: fetch the location
-    // get latitude longitude data method
+    //get locaion from local but if not found got to gps
+    func getLocation(){
+        if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
+            lat = UserDefaults.standard.double(forKey: "lat")
+            long = UserDefaults.standard.double(forKey: "long")
+            timezone()
+        }else{
+            loctionManger.startUpdatingLocation()
+            locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
+        }
+    }
+    
+    
+    
+    
+    // get location from gps
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
+        //to chick if there is saved location dont go to the api
         if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
             lat = UserDefaults.standard.double(forKey: "lat")
             long = UserDefaults.standard.double(forKey: "long")
@@ -219,6 +261,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     
+    
     //MARK: fetch timezone
     // timezone method
     func timezone(){
@@ -234,13 +277,12 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         }
         // call API method
         API( lat: lat, long: long, timeZone: timeZone!)
-
     }
     
     
     
     
-    //MARK: fetch prayers times
+    //MARK: fetch prayers times from ISLAMHOUS API
     // Api pray Time method
     func API ( lat : Double , long : Double , timeZone : String){
         // url of API
@@ -250,13 +292,12 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
                 if response.result.isSuccess {
                     // save JSON result in variable
                     let fetchedPrayerTimes : JSON = JSON(response.result.value!)
-                   // show pray time in UI
+                    // show pray time in UI
                     self.fajerPrayerTime.text = fetchedPrayerTimes["times"][0].stringValue
                     self.dohorPrayerTime.text = fetchedPrayerTimes["times"][2].stringValue
                     self.aserPrayerTime.text = fetchedPrayerTimes["times"][3].stringValue
                     self.maghrebPrayerTime.text  = fetchedPrayerTimes["times"][5].stringValue
                     self.ishaPrayerTime.text =  fetchedPrayerTimes["times"][6].stringValue
-                   
                     
                     self.timesOfPrayers.removeAll()
                     self.timesOfPrayers.append(fetchedPrayerTimes["times"][0].stringValue )
@@ -264,10 +305,9 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
                     self.timesOfPrayers.append(fetchedPrayerTimes["times"][3].stringValue )
                     self.timesOfPrayers.append(fetchedPrayerTimes["times"][5].stringValue )
                     self.timesOfPrayers.append(fetchedPrayerTimes["times"][6].stringValue )
-                                        SVProgressHUD.dismiss()
-
+                    
+                    SVProgressHUD.dismiss()
                     self.determineTheNextPrayer()
-
                 } else {
                     print("Error: \(String(describing: response.result.error))")
                 }
@@ -275,63 +315,28 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     }
     
     
-    func playSound(){
-             do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: .mixWithOthers)
-            print("Playback OK")
-            try AVAudioSession.sharedInstance().setActive(true)
-            print("Session is Active")
-        } catch {
-            print(error)
-        }
-        
-      
-        if let url = Bundle.main.url(forResource: "019--1", withExtension: "mp3"){
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-        }catch{
-            print(error)
-        }
-            audioPlayer.play()
-            
-        }
-    }
     
     
-    
-    //track the shacking of the phone
-    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
-        if audioPlayer.isPlaying {
-            audioPlayer.stop()
-        }
-    }
-    
-    
-    
-    //MARK:- show updates on screen 
-    //chek which is the next prayer
-
+    //MARK:- get and calculate data from fetched data
+    //chick which is the next prayer
     func determineTheNextPrayer(){
         fetchCurrentTime()
         for index in 0...4{
             getPrayerTime(at: index)
             
             if currentHour! <= hourOfPrayerTime! {
-               
+                
                 if currentMinute! < minuteOfPrayTime!{
                     setCountDownTime(at: index)
-                
+                    
                 }else {
                     // if current minutes is greater so it will count to the next pray
                     getPrayerTime(at: index + 1)
                     setCountDownTime(at: index + 1)
-                  
-                   // playsound()
                 }
                 break
             }
         }
-        
         //to show the result on screen and update it every second
         timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(MainCity.updateTimer)), userInfo: nil, repeats: true)
@@ -339,7 +344,9 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     }
     
     
-    //fetch the date and time
+    
+    
+    //get the currunt time
     func fetchCurrentTime(){
         let date = Date()
         let calendar = Calendar.current
@@ -351,18 +358,16 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     
-    //get prayer time of the determined prayer to compare it with current time
+    //get prayer time of the determined prayer from results of api
     func getPrayerTime(at index: Int){
         hourOfPrayerTime = Int(timesOfPrayers[index].split(separator: ":")[0])!
         minuteOfPrayTime = Int(timesOfPrayers[index].split(separator: ":")[1])!
-        
     }
     
     
     
     
-    
-    //set the Values of count down numbers to the next prayer
+    //compare current time to prayers time to determine the next prayer
     func setCountDownTime(at index: Int){
         countDownHour = hourOfPrayerTime! - currentHour!
         countDownMinute = minuteOfPrayTime! - currentMinute!
@@ -372,13 +377,14 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         }
         indexOfNextPrayer = index
         updateNextPrayerColores()
-       
-        
+        playSound()
     }
     
     
- 
-    //make the next prayer  bold to destinguish it
+    
+    
+    //MARK:- show updates on screen
+    //make the next prayer bold to destinguish it
     func updateNextPrayerColores(){
         switch(indexOfNextPrayer){
         case 0 :do {
@@ -402,23 +408,74 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             makeBright(atPrayer: maghrebPrayer, atTime: maghrebPrayerTime)
             }
         default:print("error")
-            
-            
+        }
+    }
+    
+    
+    
+    
+    //make the determined prayer bold to distinguesh it between the others
+    func makeBold(atPrayer prayerLabel: UILabel ,atTime prayerTime: UILabel){
+        //make the labels black to let the user destinguesh between prayers
+        prayerLabel.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0.5)
+        prayerTime.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0.5)
+    }
+    
+    
+    
+    
+    //if the pray is boled and no need for it make it go back to original
+    func makeBright(atPrayer prayerLabels: UILabel, atTime prayerTime: UILabel){
+        prayerLabels.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0)
+        prayerTime.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0)
+    }
+    
+    
+    
+    
+    //FIXME: chick when to play the sound
+    //play azan sound when the prayer time is come
+    func playSound(){
+        //make it work in the background
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: .mixWithOthers)
+            print("Playback OK")
+            try AVAudioSession.sharedInstance().setActive(true)
+            print("Session is Active")
+        } catch {
+            print(error)
+        }
         
-     
-
+        if let url = Bundle.main.url(forResource: "019--1", withExtension: "mp3"){
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: url)
+            }catch{
+                print(error)
+            }
+            audioPlayer.play()
+            
+        }
     }
+    
+    
+    
+    
+    //track the shacking of the phone
+    override func motionEnded(_ motion: UIEventSubtype, with event: UIEvent?) {
+        if audioPlayer.isPlaying {
+            audioPlayer.stop()
+        }
     }
     
     
     
     
+    //FIXME:make shure from threads and how it work
+    //updates the time on next prayer every second
     @objc func updateTimer() {
-        
         isTimerRunning = !isTimerRunning ? isTimerRunning : isTimerRunning
-        
         if countDownSeconds == 0 {
-            
+
             if countDownMinute == 0{
                 //  countDownMinute = 59
                 if countDownHour == 0 {
@@ -439,10 +496,8 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             countDownSeconds -= 1
         }
         nextPrayerTime.text = "\(countDownHour):\(countDownMinute):\(countDownSeconds)"
-        
         //set the notification
         if countDownHour == 0 && countDownMinute == 5 && countDownSeconds == 0 {
-            
             sendNotification()
         }
     }
@@ -450,43 +505,8 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     
-    func getLocation(){
-      
-        if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
-            lat = UserDefaults.standard.double(forKey: "lat")
-            long = UserDefaults.standard.double(forKey: "long")
-            timezone()
-            
-        }else{
-            loctionManger.startUpdatingLocation()
-            locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
-          
-        }
-    }
-    
-    
-    
-    
-    func makeBold(atPrayer prayerLabel: UILabel ,atTime prayerTime: UILabel){
-        //make the labels black to let the user destinguesh between prayers
-        prayerLabel.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0.5)
-        prayerTime.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0.5)
-
-        }
-    
-
-    
-    
-    func makeBright(atPrayer prayerLabels: UILabel, atTime prayerTime: UILabel){
-        prayerLabels.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0)
-        prayerTime.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0)
-    }
-    
-    
-    
-    
-   
-    
+    //FIXME: NOTIFICATION DONT WORK
+    ////when azan is soon send notification to the user
     func sendNotification(){
         let prayers = ["fajer","dohor","asr","maghreb","isha"]
         
@@ -499,33 +519,6 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         
         UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
-    
-    
-  
-    
-    
-    
-    
-    func convertToAM(time : Int , prayNumber: Int) -> String{
-        
-        if time > 12 {
-            
-            return "\(time - 12) : \(Int(timesOfPrayers[prayNumber].split(separator: ":")[1])!) PM"
-           
-        }
-        else {
-            
-            return "\(time) : \(Int(timesOfPrayers[prayNumber].split(separator: ":")[1])!) AM" }
-    }
-    
-    
-    
-    
-    func getHour(prayNumber : Int) -> Int{
-        
-        return Int(timesOfPrayers[prayNumber].split(separator: ":")[0])!
-    }
-    
 }
 
 
