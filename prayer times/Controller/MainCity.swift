@@ -10,7 +10,6 @@
 //TODO:fix bright of next prayer
 //TODO:bring comment from old code
 //TODO:fix synce of time
-
 import UIKit
 import ChameleonFramework
 import Alamofire
@@ -24,9 +23,7 @@ import SVProgressHUD
 
 class MainCity: UIViewController, CLLocationManagerDelegate  {
 
-    var sound : AVAudioPlayer!
- 
-    //MARK: Labels
+    //MARK:- Labels
     //MARK: label of the name of the city
     @IBOutlet weak var cityNameLabel: UILabel!
     //MARK: Prayers labels
@@ -43,7 +40,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     @IBOutlet weak var aserPrayerTime: UILabel!
     @IBOutlet weak var maghrebPrayerTime: UILabel!
     @IBOutlet weak var ishaPrayerTime: UILabel!
-   
+    //MARK:- varibels
     //MARK: array of all the countries
     var countriesEN: [String] = []
     var countriesAR: [String] = []
@@ -67,6 +64,42 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     var hourOfPrayerTime: Int?
     var minuteOfPrayTime: Int?
     var isAM : Bool = false
+    var isTimerRunning : Bool = false
+    //MARK: varible of the sound
+    var audioPlayer : AVAudioPlayer!
+    //MARK:- Buttons
+    //to refresh tho location if the user is in another city
+    @IBAction func refreshButtonPressed(_ sender: UIButton) {
+        SVProgressHUD.show()
+        getCityName()
+        
+        loctionManger.startUpdatingLocation()
+        locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
+    }
+    
+    
+    
+    //FIXME: CHANGE THE DESIGHN
+    //convert the time form
+    @IBAction func convertionBetweenAMAndPM(_ sender: UIButton) {
+        if isAM {
+            fajerPrayerTime.text = timesOfPrayers[0]
+            dohorPrayerTime.text = timesOfPrayers[1]
+            aserPrayerTime.text = timesOfPrayers[2]
+            maghrebPrayerTime.text = timesOfPrayers[3]
+            ishaPrayerTime.text = timesOfPrayers[4]
+            isAM = !isAM
+            
+        }else{
+            fajerPrayerTime.text = convertToAM(time: getHour(prayNumber: 0), prayNumber: 0)
+            dohorPrayerTime.text = convertToAM(time: getHour(prayNumber: 1), prayNumber: 1)
+            aserPrayerTime.text = convertToAM(time: getHour(prayNumber: 2), prayNumber: 2)
+            maghrebPrayerTime.text = convertToAM(time: getHour(prayNumber: 3), prayNumber: 3)
+            ishaPrayerTime.text = convertToAM(time: getHour(prayNumber: 4), prayNumber: 4)
+            isAM = !isAM
+        }
+    }
+    
     
     
     
@@ -75,7 +108,8 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         super.viewDidLoad()
         SVProgressHUD.show()
  
-      // jumaa exeption
+        //FIXME: PUT IT IN OTHER PLACE
+        // jumaa exeption
         let date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE"
@@ -88,8 +122,8 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
        
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.badge,.sound]) { (didallow, error) in
         }
+        
         // loction configuration
-
         loctionManger.delegate = self
         loctionManger.desiredAccuracy = kCLLocationAccuracyBest
         loctionManger.requestWhenInUseAuthorization()
@@ -102,6 +136,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         getLocation()
         sendNotification()
     }
+    
     
     
     
@@ -121,10 +156,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     
-    //bring the city name from gps and display it in screen
-     func getCityName() {
-        if let cityName = UserDefaults.standard.string(forKey: "cityName"){
-            cityNameLabel.text = cityName
+  
               //MARK: fetch the city name
     //TODO: consider if want to change the value of city in local 
     //bring the city name from gps and display it in screen
@@ -153,10 +185,9 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     }
     
  
-        }
-    }
+        
     
-    ////////////////////////////////
+    
     
     
     //MARK: fetch the location
@@ -187,7 +218,6 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     }
     
     
-    //////////////////////
     
     //MARK: fetch timezone
     // timezone method
@@ -242,6 +272,9 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
                     print("Error: \(String(describing: response.result.error))")
                 }
         }
+    }
+    
+    
     func playSound(){
              do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback, with: .mixWithOthers)
@@ -300,15 +333,11 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         }
         
         //to show the result on screen and update it every second
+        timer.invalidate()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(MainCity.updateTimer)), userInfo: nil, repeats: true)
         SVProgressHUD.dismiss()
     }
     
-    
-    func playsound() {
-       sound.play()
-    
-    }
     
     //fetch the date and time
     func fetchCurrentTime(){
@@ -343,10 +372,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         }
         indexOfNextPrayer = index
         updateNextPrayerColores()
-         //to show the result on screen and update it every second
-        //if timer.timeInterval > 1 {timer.timeInterval.distance(to: 1)}
-        timer.invalidate()
-        timer = Timer.scheduledTimer(timeInterval: 1, target: self,   selector: (#selector(MainCity.updateTimer)), userInfo: nil, repeats: true)
+       
         
     }
     
@@ -381,6 +407,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         
      
 
+    }
     }
     
     
@@ -445,16 +472,9 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         prayerLabel.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0.5)
         prayerTime.backgroundColor = UIColor(hexString: "023F56").withAlphaComponent(0.5)
 
+        }
     
-    @IBAction func refreshButtonPressed(_ sender: UIButton) {
-        SVProgressHUD.show()
-        getCityName()
 
-        loctionManger.startUpdatingLocation()
-        locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
-    }
-    
-    
     
     
     func makeBright(atPrayer prayerLabels: UILabel, atTime prayerTime: UILabel){
@@ -465,37 +485,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     
-    //the function runs every seconed to show the rest time to nearest prayer
-    @objc func updateTimer() {
-        
-        if countDownSeconds == 0 {
-            
-            if countDownMinute == 0{
-                //  countDownMinute = 59
-                if countDownHour == 0 {
-                    // here is the time for azan
-                    if indexOfNextPrayer == 4 {
-                        //if it is isha pray so next will be fajer
-                        indexOfNextPrayer = -1
-                    }
-                    getPrayerTime(at: indexOfNextPrayer + 1)
-                    setCountDownTime(at: indexOfNextPrayer + 1)
-                    
-                }else{
-                    countDownHour -= 1
-                    countDownMinute = 59
-                    countDownSeconds = 59
-                }
-            }else{
-                countDownMinute -= 1
-                countDownSeconds = 59
-            }
-        }else{
-            countDownSeconds -= 1
-        }
-        nextPrayerTime.text = "\(countDownHour):\(countDownMinute):\(countDownSeconds)"
-        
-    }
+   
     
     func sendNotification(){
         let prayers = ["fajer","dohor","asr","maghreb","isha"]
@@ -511,30 +501,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     }
     
     
-    
-    @IBAction func convertionBetweenAMAndPM(_ sender: UIButton) {
-      
-        
-        
-        if isAM {
-            fajerPrayerTime.text = timesOfPrayers[0]
-            dohorPrayerTime.text = timesOfPrayers[1]
-            aserPrayerTime.text = timesOfPrayers[2]
-            maghrebPrayerTime.text = timesOfPrayers[3]
-            ishaPrayerTime.text = timesOfPrayers[4]
-            isAM = !isAM
-            
-        }else{
-            fajerPrayerTime.text = convertToAM(time: getHour(prayNumber: 0), prayNumber: 0)
-            dohorPrayerTime.text = convertToAM(time: getHour(prayNumber: 1), prayNumber: 1)
-            aserPrayerTime.text = convertToAM(time: getHour(prayNumber: 2), prayNumber: 2)
-            maghrebPrayerTime.text = convertToAM(time: getHour(prayNumber: 3), prayNumber: 3)
-            ishaPrayerTime.text = convertToAM(time: getHour(prayNumber: 4), prayNumber: 4)
-            isAM = !isAM
-        }
-        
-        
-    }
+  
     
     
     
@@ -561,10 +528,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
 }
 
-}
-}
-}
-}
+
 
 
 
