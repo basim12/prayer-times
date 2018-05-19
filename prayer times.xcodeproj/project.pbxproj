@@ -16,6 +16,8 @@
 		297394D320987D6F00411F1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 297394D220987D6F00411F1A /* Assets.xcassets */; };
 		297394D620987D6F00411F1A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 297394D420987D6F00411F1A /* LaunchScreen.storyboard */; };
 		8D4CC00B20A02AA5000923D7 /* DisplayAnotherCity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4CC00A20A02AA5000923D7 /* DisplayAnotherCity.swift */; };
+		8D521BE820AAEC6D000ADB1B /* hello.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 8D521BE720AAEC6D000ADB1B /* hello.mp3 */; };
+		8D521BEA20AAEF00000ADB1B /* salah.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 8D521BE920AAEF00000ADB1B /* salah.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		4BCFB933F7D3DE5FC3EFA3A3 /* Pods-prayer times.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-prayer times.debug.xcconfig"; path = "Pods/Target Support Files/Pods-prayer times/Pods-prayer times.debug.xcconfig"; sourceTree = "<group>"; };
 		617618D8E5BC67783F14214F /* Pods-prayer times.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-prayer times.release.xcconfig"; path = "Pods/Target Support Files/Pods-prayer times/Pods-prayer times.release.xcconfig"; sourceTree = "<group>"; };
 		8D4CC00A20A02AA5000923D7 /* DisplayAnotherCity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayAnotherCity.swift; sourceTree = "<group>"; };
+		8D521BE720AAEC6D000ADB1B /* hello.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = hello.mp3; sourceTree = "<group>"; };
+		8D521BE920AAEF00000ADB1B /* salah.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = salah.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +117,8 @@
 		297394E02098879700411F1A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				8D521BE720AAEC6D000ADB1B /* hello.mp3 */,
+				8D521BE920AAEF00000ADB1B /* salah.mp3 */,
 				295599B720A436630022EBFB /* 019--1.mp3 */,
 				297394D220987D6F00411F1A /* Assets.xcassets */,
 				297394D720987D6F00411F1A /* Info.plist */,
@@ -198,6 +204,8 @@
 			files = (
 				297394D620987D6F00411F1A /* LaunchScreen.storyboard in Resources */,
 				295599B820A436630022EBFB /* 019--1.mp3 in Resources */,
+				8D521BEA20AAEF00000ADB1B /* salah.mp3 in Resources */,
+				8D521BE820AAEC6D000ADB1B /* hello.mp3 in Resources */,
 				297394D320987D6F00411F1A /* Assets.xcassets in Resources */,
 				297394D120987D6700411F1A /* Main.storyboard in Resources */,
 			);

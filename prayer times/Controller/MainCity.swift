@@ -65,21 +65,26 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     var minuteOfPrayTime: Int?
     var isAM : Bool = false
     var isTimerRunning : Bool = false
+    var updateLocation : Bool = false
     //MARK: varible of the sound
     var audioPlayer : AVAudioPlayer!
     //MARK:- Buttons
     //to refresh tho location if the user is in another city
     @IBAction func refreshButtonPressed(_ sender: UIButton) {
         SVProgressHUD.show()
+        updateLocation = true
         getCityName()
         
+        loctionManger.delegate = self
+        loctionManger.desiredAccuracy = kCLLocationAccuracyBest
+        loctionManger.requestWhenInUseAuthorization()
         loctionManger.startUpdatingLocation()
-        locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
+       // locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
     }
     
     
     
-    //FIXME: CHANGE THE DESIGHN
+    
     //convert the time form
     @IBAction func convertionBetweenAMAndPM(_ sender: UIButton) {
         if isAM {
@@ -138,19 +143,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     override func viewDidLoad() {
         super.viewDidLoad()
         SVProgressHUD.show()
- 
-        //FIXME: PUT IT IN OTHER PLACE
-        // jumaa exeption
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE"
-        let dayInWeek = formatter.string(from: date)
         
-        if (dayInWeek == "Friday"){
-            dohorPrayer.text = "Friday"
-        }
-        
-       
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert,.badge,.sound]) { (didallow, error) in
         }
         
@@ -158,14 +151,17 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
         loctionManger.delegate = self
         loctionManger.desiredAccuracy = kCLLocationAccuracyBest
         loctionManger.requestWhenInUseAuthorization()
-       
+        loctionManger.startUpdatingLocation()
+        
         //fetch the countries of the worled
         //fetchCountries()
         
         placesClient = GMSPlacesClient.shared()
         getCityName()
-        getLocation()
-        sendNotification()
+        //getLocation()
+        checkIfJumaaOrNot()
+      //  soundNotification()
+ 
     }
     
     
@@ -188,12 +184,11 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     
     
     //MARK: fetch the city name from GOOGLE MAP API
-    //FIXME: consider if want to change the value of city in local
-    //FIXME: can not get city name
+    // updateLocation consider if want to change the value of city in local
     //bring the city name from gps and display it in screen
      func getCityName() {
         //to chick if there is a saved name dont go to the api
-        if UserDefaults.standard.string(forKey: "cityName") != nil{
+        if UserDefaults.standard.string(forKey: "cityName") != nil && !updateLocation{
             self.cityNameLabel.text = UserDefaults.standard.string(forKey: "cityName")
         }else{
         placesClient.currentPlace(callback: { (placeLikelihoodList, error) -> Void in
@@ -220,13 +215,9 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     //MARK: fetch the location
     //get locaion from local but if not found got to gps
     func getLocation(){
-        print("hleoooooooooooooooooooooooo")
-        print(UserDefaults.standard.double(forKey: "lat"))
-          print("hleoooooooooooooooooooooooo")
-       var testlat =  UserDefaults.standard.double(forKey: "lat")
-        var testlong =  UserDefaults.standard.double(forKey: "long")
-        if  testlat != nil &&  testlong != nil {
-        
+
+        if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil && !updateLocation {
+
             lat = UserDefaults.standard.double(forKey: "lat")
             long = UserDefaults.standard.double(forKey: "long")
             print("whyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
@@ -234,7 +225,7 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
             print(long)
             print("whyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
             timezone()
-        }else{
+        } else{
             print("reallyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy")
             loctionManger.startUpdatingLocation()
             locationManager(CLLocationManager.init(), didUpdateLocations: [CLLocation].init())
@@ -248,12 +239,12 @@ class MainCity: UIViewController, CLLocationManagerDelegate  {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         print("//////////////////////////////////////////////////////")
         //to chick if there is saved location dont go to the api
-        if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
-            lat = UserDefaults.standard.double(forKey: "lat")
-            long = UserDefaults.standard.double(forKey: "long")
-            timezone()
-
-        }else{
+//        if  UserDefaults.standard.double(forKey: "lat") != nil &&  UserDefaults.standard.double(forKey: "long") != nil {
+//            lat = UserDefaults.standard.double(forKey: "lat")
+//            long = UserDefaults.standard.double(forKey: "long")
+//            timezone()
+//
+//        }else{
         let location = locations[locations.count - 1]
         // if data not = 0
         if location.horizontalAccuracy > 0 {
@@ -271,7 +262,7 @@ print("//////////////////////////////////////////////////////")
             // call TimeZone Method
             timezone()
         }
-        }
+     //   }
     }
     
     
@@ -282,13 +273,16 @@ print("//////////////////////////////////////////////////////")
     func timezone(){
         // get timezone data
         let timeZone : String?
-       if let curTimeZone = UserDefaults.standard.string(forKey: "timeZone"){
-            timeZone = curTimeZone
+
+        if  (UserDefaults.standard.string(forKey: "timeZone") != nil) && !updateLocation{
+            timeZone = UserDefaults.standard.string(forKey: "timeZone")
+
         } else {
         var localTimeZoneAbbreviation: String { return TimeZone.current.abbreviation() ?? "" }
         // git only number of timezone using substring
          timeZone = String(localTimeZoneAbbreviation.suffix(2))
             UserDefaults.standard.set(timeZone , forKey: "timeZone")
+            updateLocation = false
         }
         // call API method
         API( lat: lat, long: long, timeZone: timeZone!)
@@ -323,6 +317,7 @@ print("//////////////////////////////////////////////////////")
                     self.timesOfPrayers.append(fetchedPrayerTimes["times"][6].stringValue )
                     
                     SVProgressHUD.dismiss()
+                   
                     self.determineTheNextPrayer()
                 } else {
                     print("Error: \(String(describing: response.result.error))")
@@ -337,14 +332,16 @@ print("//////////////////////////////////////////////////////")
     //chick which is the next prayer
     func determineTheNextPrayer(){
         fetchCurrentTime()
+
         for index in 0...4{
             getPrayerTime(at: index)
             
-            if currentHour! <= hourOfPrayerTime! {
-                
+            if currentHour! < hourOfPrayerTime! {
+                setCountDownTime(at: index)
+                break
+            }else if currentHour! == hourOfPrayerTime!{
                 if currentMinute! < minuteOfPrayTime!{
                     setCountDownTime(at: index)
-                    
                 }else {
                     // if current minutes is greater so it will count to the next pray
                     getPrayerTime(at: index + 1)
@@ -388,12 +385,13 @@ print("//////////////////////////////////////////////////////")
         countDownHour = hourOfPrayerTime! - currentHour!
         countDownMinute = minuteOfPrayTime! - currentMinute!
         if countDownMinute < 0 {
-            countDownMinute = 59 - countDownMinute
+            countDownMinute = 59 + countDownMinute
             countDownHour = countDownHour - 1
         }
         indexOfNextPrayer = index
         updateNextPrayerColores()
-    
+
+
     }
     
     
@@ -406,22 +404,63 @@ print("//////////////////////////////////////////////////////")
         case 0 :do {
             makeBold(atPrayer: fajerPrayer, atTime: fajerPrayerTime)
             makeBright(atPrayer: ishaPrayer, atTime: ishaPrayerTime)
+            var  hours = ""
+            var  mins = ""
+            
+            let fajer : String = fajerPrayerTime.text!
+            if let hour = fajer.range(of: ":") {
+                  hours = String(fajer[fajer.startIndex..<hour.lowerBound])
+                print(hour)
+            }
+            
+            if let range = fajer.range(of: ":") {
+                mins = String(fajer[range.upperBound...])
+                print(mins)
+            }
+            
+         //   soundNotification(hour : Int(hours)!,min: Int(mins)!)
+            
+            
             }
         case 1 :do {
             makeBold(atPrayer: dohorPrayer, atTime: dohorPrayerTime)
             makeBright(atPrayer: fajerPrayer, atTime: fajerPrayerTime)
+            
+            var  hours = ""
+            var  mins = ""
+            
+            let dohor : String = dohorPrayerTime.text!
+            if let hour = dohor.range(of: ":") {
+                hours = String(dohor[dohor.startIndex..<hour.lowerBound])
+                print(hours)
+            }
+            
+            if let range = dohor.range(of: ":") {
+                mins = String(dohor[range.upperBound...])
+                print(mins)
+            }
+            
+            
+      soundNotification(hour : Int(hours)!,min: Int(mins)!)
+            
             }
         case 2 :do {
             makeBold(atPrayer: aserPrayer, atTime: aserPrayerTime)
             makeBright(atPrayer: dohorPrayer, atTime: dohorPrayerTime)
+            
+          ///  soundNotification()
             }
         case 3 :do {
             makeBold(atPrayer: maghrebPrayer, atTime: maghrebPrayerTime)
             makeBright(atPrayer: aserPrayer, atTime: aserPrayerTime)
+            
+          //  soundNotification()
             }
         case 4 :do {
             makeBold(atPrayer: ishaPrayer, atTime: ishaPrayerTime)
             makeBright(atPrayer: maghrebPrayer, atTime: maghrebPrayerTime)
+            
+           // soundNotification()
             }
         default:print("error")
         }
@@ -449,7 +488,6 @@ print("//////////////////////////////////////////////////////")
     
     
     
-    //FIXME: chick when to play the sound
     //play azan sound when the prayer time is come
     func playSound(){
         //make it work in the background
@@ -486,7 +524,7 @@ print("//////////////////////////////////////////////////////")
     
     
     
-    //FIXME:make shure from threads and how it work
+
     //updates the time on next prayer every second
     @objc func updateTimer() {
         isTimerRunning = !isTimerRunning ? isTimerRunning : isTimerRunning
@@ -497,8 +535,9 @@ print("//////////////////////////////////////////////////////")
                 if countDownHour == 0 {
                     // here is the time for azan
                     determineTheNextPrayer()
-                    playSound()
-                    
+                   // playSound()
+                  //  soundNotification()
+                //  nc()
                 }else{
                     countDownHour -= 1
                     countDownMinute = 59
@@ -528,7 +567,7 @@ print("//////////////////////////////////////////////////////")
         let prayers = ["fajer","dohor","asr","maghreb","isha"]
         
         let content = UNMutableNotificationContent()
-        content.title = "\(prayers[indexOfNextPrayer]) azan will be after 5 minutes"
+        content.title = "\(prayers[indexOfNextPrayer + 1]) azan will be after 5 minutes"
         content.badge = 1
 
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 10, repeats: false)
@@ -536,6 +575,58 @@ print("//////////////////////////////////////////////////////")
         
         UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
     }
+    
+    
+    func soundNotification(hour : Int , min : Int){
+     
+        let prayers = ["fajer","dohor","asr","maghreb","isha"]
+        
+        let content = UNMutableNotificationContent()
+        content.title = "\(prayers[indexOfNextPrayer + 1]) azan will be after 5 minutes"
+        content.badge = 1
+        content.sound = UNNotificationSound(named: "salah.mp3")
+        var dateComponents = DateComponents()
+       dateComponents.hour = hour
+        dateComponents.minute = min 
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents , repeats: false)
+        //UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let request = UNNotificationRequest(identifier: "azanSoon", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+      
+    }
+    
+    func nc (){
+        let prayers = ["fajer","dohor","asr","maghreb","isha"]
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+        let content = UNMutableNotificationContent()
+        content.title = "\(prayers[indexOfNextPrayer + 1]) azan will be after 5 minutes"
+        content.body = " "
+        content.badge = 1
+        content.sound = UNNotificationSound(named: "salah.mp3")
+        let request = UNNotificationRequest(identifier: "azanSoon", content: content, trigger: trigger)
+        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        UNUserNotificationCenter.current().add(request) {(error) in
+            if let error = error {
+                print("error: \(error)")
+            }
+        }
+    }
+    
+    
+    //check jumaa
+    func checkIfJumaaOrNot(){
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE"
+        let dayInWeek = formatter.string(from: date)
+        
+        if (dayInWeek == "Friday"){
+            dohorPrayer.text = "Friday"
+        }
+}
+
 }
 
 

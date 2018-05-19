@@ -378,21 +378,30 @@
                                         <rect key="frame" x="0.0" y="260.33333333333331" width="414" height="65.666666666666686"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="      Next prayer" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nOS-QG-Bif">
-                                                <rect key="frame" x="0.0" y="0.0" width="207.33333333333334" height="65.666666666666671"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="177.66666666666666" height="65.666666666666671"/>
                                                 <color key="backgroundColor" red="0.0065792614640000002" green="0.24639221950000001" blue="0.3355423347" alpha="0.60097388699999998" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cje-KM-0Oj">
-                                                <rect key="frame" x="207.33333333333337" y="0.0" width="206.66666666666663" height="65.666666666666671"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00:00" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cje-KM-0Oj">
+                                                <rect key="frame" x="177.66666666666663" y="0.0" width="177.33333333333337" height="65.666666666666671"/>
                                                 <color key="backgroundColor" red="0.0065792614640000002" green="0.24639221950000001" blue="0.3355423347" alpha="0.60097388699999998" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                                 <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gPm-oE-r4X">
+                                                <rect key="frame" x="355" y="0.0" width="59" height="65.666666666666671"/>
+                                                <color key="backgroundColor" red="0.0" green="0.24639221950000001" blue="0.3355423347" alpha="0.60097388699999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <state key="normal" image="watch2"/>
+                                                <connections>
+                                                    <action selector="convertionBetweenAMAndPM:" destination="Rks-oM-6XH" eventType="touchUpInside" id="iv7-fj-PaZ"/>
+                                                </connections>
+                                            </button>
                                         </subviews>
                                         <constraints>
+                                            <constraint firstItem="gPm-oE-r4X" firstAttribute="width" secondItem="Cje-KM-0Oj" secondAttribute="width" multiplier="1:3" id="3uC-8w-7q5"/>
                                             <constraint firstItem="Cje-KM-0Oj" firstAttribute="width" secondItem="nOS-QG-Bif" secondAttribute="width" id="YXb-Qq-Yk8"/>
                                         </constraints>
                                     </stackView>
@@ -553,19 +562,19 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="AserPrayerTime" destination="qDL-Am-I54" id="1E3-ih-BTO"/>
-                        <outlet property="DohorPrayerTime" destination="hyB-RL-wNl" id="eEp-dc-N9J"/>
-                        <outlet property="FajerPrayerTime" destination="MP6-gH-YRk" id="7KL-nO-5gd"/>
-                        <outlet property="IshaPrayerTime" destination="IVP-o8-z2Q" id="r5i-hb-LcE"/>
-                        <outlet property="MaghrebPrayerTime" destination="89j-LQ-kMU" id="QXx-CI-IWv"/>
-                        <outlet property="NextPrayerTime" destination="Cje-KM-0Oj" id="deg-nd-dJI"/>
                         <outlet property="aserPrayer" destination="acW-vv-hqi" id="m7W-Rd-KKg"/>
-                        <outlet property="citynamelable" destination="mrL-WX-YHR" id="8HN-Hw-USL"/>
+                        <outlet property="aserPrayerTime" destination="qDL-Am-I54" id="knH-jo-QNb"/>
+                        <outlet property="cityNameLabel" destination="mrL-WX-YHR" id="Dby-5l-RfC"/>
                         <outlet property="dohorPrayer" destination="haF-Dw-b2M" id="4Gv-GB-c3D"/>
+                        <outlet property="dohorPrayerTime" destination="hyB-RL-wNl" id="yIY-3z-ofY"/>
                         <outlet property="fajerPrayer" destination="UOf-lQ-Zju" id="fzR-Mx-z6G"/>
+                        <outlet property="fajerPrayerTime" destination="MP6-gH-YRk" id="Vmj-MX-lXK"/>
                         <outlet property="ishaPrayer" destination="wxt-VV-cYc" id="ZQw-8o-8ru"/>
+                        <outlet property="ishaPrayerTime" destination="IVP-o8-z2Q" id="DxJ-Bp-8VZ"/>
                         <outlet property="maghrebPrayer" destination="j0b-9H-tZQ" id="reD-bq-pvB"/>
+                        <outlet property="maghrebPrayerTime" destination="89j-LQ-kMU" id="IE6-Lt-LCG"/>
                         <outlet property="nextPrayer" destination="nOS-QG-Bif" id="CAa-AB-IIK"/>
+                        <outlet property="nextPrayerTime" destination="Cje-KM-0Oj" id="BFM-00-hGW"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NIX-6H-nPy" sceneMemberID="firstResponder"/>
